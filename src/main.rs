@@ -9,11 +9,17 @@ extern crate lettre;
 extern crate lettre_email;
 extern crate mime;
 
+mod config;
+
+
 fn main() {
-    let email_receiver = "849931817@qq.com";
-    let mine_email = "18519247208@qq.com";
-    let smtp_server = "smtp.qq.com";
-    let password = ""; //需要生成应用专用密码
+    let cli = config::CliOpts::init();
+
+    let config = cli.parse();
+    let email_receiver = config.email.address;
+    let mine_email = config.email.smtp_host;
+    let smtp_server = config.email.smtp_server;
+    let password = config.email.password; //需要生成应用专用密码
 
     let email = Email::builder()
         .to(email_receiver)
@@ -32,7 +38,7 @@ Please restart/ reboot your Deeper Connect to reconnect to Deeper Chain. If the 
     );
 
     // Open connection to Gmail
-    let mut mailer = SmtpClient::new_simple(smtp_server)
+    let mut mailer = SmtpClient::new_simple(&smtp_server)
         .unwrap()
         .credentials(creds)
         .transport();
